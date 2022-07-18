@@ -8,11 +8,11 @@
 # breaking down the non-zero coordinates into simple, interaction and quadratic effects
 
 sparse.param.quad.model<-function(s,m, interOnly=FALSE, theta_range=theta_range){
-  K<-m#floor(sqrt(2*m))
+  K<-m
   if(interOnly){
     # only diag pure interaction
-    pu.int<-s#floor(s/2) #pure interaction
-    pu.fi.or<-0#s-floor(s/2) #pure first order
+    pu.int<-s #pure interaction
+    pu.fi.or<-0 #pure first order
   }else{
     #mixed model
     pu.int<-floor(s/2) #pure interaction
@@ -29,7 +29,7 @@ sparse.param.quad.model<-function(s,m, interOnly=FALSE, theta_range=theta_range)
 
 generate.quad.design<-function(m,n){
   
-  K<-m#floor(sqrt(2*m)) # K is nb of SNP
+  K<-m # K is nb of SNP
   idx=c(1:K)
   
   X<-matrix(rbinom(K*n,1,p),nrow=n) # X binomial matrix with p the success rate (centered using p)
@@ -94,7 +94,7 @@ for (n in c(50, 250, 500, 1000, 2500, 5000, 7500, 10000)){ # number of individua
   
   # Random effect model
   # p follows a normal distribution with small variance
-  noise.al= noise.fixe# (1-h2)*(var.theta)/h2 # - var.theta ?
+  noise.al= noise.fixe
   trK = sum(X^2)
   var.poly.effect = (var.theta * ( -1 + (h2/(1-h2))*((1-s2)/s2))) / trK
   g <- sqrt(var.poly.effect[[1]]) * X %*% rnorm(dim(theta)[1], mean=0)
