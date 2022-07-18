@@ -9,8 +9,6 @@
 
 sparse.param.quad.model<-function(s,m, interOnly=FALSE, theta_range=theta_range){
   K<-m#floor(sqrt(2*m))
-  print(K)
-  ##s>3
   if(interOnly){
     # only diag pure interaction
     pu.int<-s#floor(s/2) #pure interaction
@@ -21,21 +19,10 @@ sparse.param.quad.model<-function(s,m, interOnly=FALSE, theta_range=theta_range)
     pu.fi.or<-s-floor(s/2) #pure first order
   }
   
-  #Sinon a rajouter potentiellement (code a adapter)
-  #pu.qua<-floor(s/4) #utile ?
-  #mix.fi.int<- floor(s/4) #mixed first order et interaction
-  #la somme des 3 (ou 4) doit valoir s !
   sup1<-sample(1:K,pu.fi.or)
-  #pour virer les termes quadratiques purs
-  #dans la matrice de design :
-  # pu.quad.ind<-(1:K)*K+3*(1:K)/2-0.5*(1:K)^2 #r??crire la preuve au propre
-  #sup2<-sample(setdiff(K+1:(K*(K-1)/2),pu.quad.ind),pu.int)
   sup2<-sample(((K+1):(K*(K+1)/2)),pu.int)
   theta <- matrix(0,K+K*(K-1)/2, 1)
   sup<-sort(c(sup1,sup2))
-  #theta[sup]<-sample(seq(-theta_range,theta_range)[seq(-theta_range,theta_range)!=0],s,replace=TRUE)
-  #theta[sup]<-sample(seq(-theta_range,theta_range, 0.1)[(seq(-theta_range,theta_range, 0.1)!=0.0)],s,replace=TRUE)
-  #theta[sup]<-sample(c(-theta_range,theta_range),s,replace=TRUE)
   theta[sup]<-sample(c(-1,1),s,replace=TRUE)
   return(theta)
 }
@@ -52,7 +39,6 @@ generate.quad.design<-function(m,n){
   X = scale(X, scale = F, center = T)
   print(X)
   for (i in 1:(K-1)){ # for each SNPs id
-    #temp<-matrix(X[,i],ncol=K-i,nrow=dim(X)[1],byrow=F) # copy K-i time the SNP column without diag
     temp<-matrix(X[,i],ncol=(K-i),nrow=dim(X)[1],byrow=F) # copy (K+1)-i time the SNP column with diag
     print(temp)
     X.int<-cbind(X.int,temp) # save it to tab
@@ -63,8 +49,6 @@ generate.quad.design<-function(m,n){
   idx.int = idx.int[-1]
   X.int<-X.int[,-1] # remove first empty column (needed for initialization)
   
-  #T<-X # init T as X with all SNP (simple) --> for diag
-  #idx.T<-idx
   T<-matrix(data = NA, nrow = dim(X)[1], byrow = FALSE)
   idx.T<-matrix(data = NA, nrow = 1, byrow = FALSE)
   
@@ -77,7 +61,6 @@ generate.quad.design<-function(m,n){
   T<-T[,-1]
   idx.T = idx.T[-1]
   
-  # X.quad<-T*X.int # add only interaction
   X.quad<-cbind(X,(T*X.int)*2)
   colnames(X.quad)<-c(paste0(idx,'-', idx),paste0(idx.int, '-', idx.T))
   
