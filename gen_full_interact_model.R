@@ -1,11 +1,11 @@
-##2 fonctions :
+##2 functions :
 
-# [generate.quad.design]  g?n?re une matrice de design "quadratique"
-##avec effets simples, d'interactions et quadra pur
-##par d?faut la matrice effets simple est binomiale
+# [generate.quad.design]  generates a "quadratic" design matrix"
+## with simple, interaction and pure quadra effects
+## by default the simple effect matrix is binomial
 
-#[sparse.param.quad.model] construit un param?tre sparse en
-#ventilant les coord non nulles entre effets simple, d'interaction, quadra
+#[sparse.param.quad.model] constructs a sparse parameter model by 
+# breaking down the non-zero coordinates into simple, interaction and quadratic effects
 
 sparse.param.quad.model<-function(s,m, interOnly=FALSE, theta_range=theta_range){
   K<-m#floor(sqrt(2*m))
@@ -85,16 +85,15 @@ for (n in c(50, 250, 500, 1000, 2500, 5000, 7500, 10000)){ # number of individua
   sup<-which(theta!=0)
   
   
-  # Model effet simple
-  # p fixé
+  # Simple effect model
+  # p fixed
   noise.fixe=(1-s2)*var.theta/s2
   
-  # Y.fixe = Xtheta + noise
   Y.fixe<-X%*%theta+matrix(rnorm(nrow(X), 0, sqrt(noise.fixe)), nrow(X), 1)
   
   
-  # Model effet aléatoire
-  # p suit une loi normale à faible variance
+  # Random effect model
+  # p follows a normal distribution with small variance
   noise.al= noise.fixe# (1-h2)*(var.theta)/h2 # - var.theta ?
   trK = sum(X^2)
   var.poly.effect = (var.theta * ( -1 + (h2/(1-h2))*((1-s2)/s2))) / trK
