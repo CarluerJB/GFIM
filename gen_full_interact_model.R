@@ -70,44 +70,44 @@ generate.quad.design<-function(m,n){
 
 h2 <- 0.4
 s2 <- 0.95 * h2
-theta_range=1
-p=0.5 # ratio 0/1 (binom rule)
-s<-5 # Number of signal
-m<-100 # number of SNPs
+theta_range = 1
+p = 0.5 # ratio 0/1 (binom rule)
+s <- 5 # Number of signal
+m <- 100 # number of SNPs
+n <- 50 # Number of individuals
 
-for (n in c(50, 250, 500, 1000, 2500, 5000, 7500, 10000)){ # number of individuals
-  # Generate X  
-  X<-generate.quad.design(m,n)
-  
-  # Generate theta
-  theta<-sparse.param.quad.model(s,m, theta_range=theta_range)
-  var.theta <- var(X%*%theta)
-  sup<-which(theta!=0)
-  
-  
-  # Simple effect model
-  # p fixed
-  noise.fixe=(1-s2)*var.theta/s2
-  
-  Y.fixe<-X%*%theta+matrix(rnorm(nrow(X), 0, sqrt(noise.fixe)), nrow(X), 1)
-  
-  
-  # Random effect model
-  # p follows a normal distribution with small variance
-  noise.al= noise.fixe
-  trK = sum(X^2)
-  var.poly.effect = (var.theta * ( -1 + (h2/(1-h2))*((1-s2)/s2))) / trK
-  g <- sqrt(var.poly.effect[[1]]) * X %*% rnorm(dim(theta)[1], mean=0)
-  
-  Y.al <- (X%*%theta) + g + matrix(rnorm(nrow(X), 0, sqrt(noise.al)), nrow(X), 1)
-  
-  # Show some result var
-  var(Y.al)
-  var(Y.fixe)
-  
-  # Save results
-  write.table(x=colnames(X)[sup], file=paste0("SUPPORT_",n,".txt") , quote = FALSE, row.names = FALSE, col.names = F)
-  write.table(x=X, file=paste0("X_generated_",n,".txt"), sep = " ", row.names = FALSE, col.names = TRUE, quote = FALSE)
-  write.table(x=Y.al, file=paste0("Y_generated_random_effect_",n,".txt"), row.names = FALSE, col.names = FALSE)
-  write.table(x=Y.fixe, file=paste0("Y_generated_fixed_effect_",n,".txt"), row.names = FALSE, col.names = FALSE)
-}
+
+# Generate X  
+X<-generate.quad.design(m,n)
+
+# Generate theta
+theta<-sparse.param.quad.model(s,m, theta_range=theta_range)
+var.theta <- var(X%*%theta)
+sup<-which(theta!=0)
+
+
+# Simple effect model
+# p fixed
+noise.fixe=(1-s2)*var.theta/s2
+
+Y.fixe<-X%*%theta+matrix(rnorm(nrow(X), 0, sqrt(noise.fixe)), nrow(X), 1)
+
+
+# Random effect model
+# p follows a normal distribution with small variance
+noise.al= noise.fixe
+trK = sum(X^2)
+var.poly.effect = (var.theta * ( -1 + (h2/(1-h2))*((1-s2)/s2))) / trK
+g <- sqrt(var.poly.effect[[1]]) * X %*% rnorm(dim(theta)[1], mean=0)
+
+Y.al <- (X%*%theta) + g + matrix(rnorm(nrow(X), 0, sqrt(noise.al)), nrow(X), 1)
+
+# Show some result var
+var(Y.al)
+var(Y.fixe)
+
+# Save results
+write.table(x=colnames(X)[sup], file="SUPPORT.txt" , quote = FALSE, row.names = FALSE, col.names = F)
+write.table(x=X, file="X_generated.txt", sep = " ", row.names = FALSE, col.names = TRUE, quote = FALSE)
+write.table(x=Y.al, file="Y_generated_random_effect.txt", row.names = FALSE, col.names = FALSE)
+write.table(x=Y.fixe, file="Y_generated_fixed_effect.txt", row.names = FALSE, col.names = FALSE)
