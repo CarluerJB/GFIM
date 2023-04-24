@@ -4,8 +4,46 @@
 ## with simple, interaction and pure quadra effects
 ## by default the simple effect matrix is binomial
 
+#[sparse.param.quad.model.many] construit un param?tre sparse en
+#ventilant les coord non nulles entre effets simple, d'interaction, quadra et mixte
+
 #[sparse.param.quad.model] constructs a sparse parameter model by 
 # breaking down the non-zero coordinates into simple, interaction and quadratic effects
+
+sparse.param.quad.model.many<-function(s,m, theta_range=theta_range){
+  K<-m
+  pu.fi.or.rate = 0.4
+  pu.int.rate = 0.20
+  mix.fi.or.int.rate = 0.20
+  pu.int.mul.rate = 0.20
+  
+  
+
+  pu.fi.or<-floor(s*pu.fi.or.rate) #pure first order
+  pu.int = floor(s*pu.int.rate) #pure interaction
+  mix.fi.or.int = floor(s*mix.fi.or.int.rate)  #mix between first order and interaction
+  
+  pu.int.mul<- s-(pu.fi.or+pu.int+mix.fi.or.int)
+  
+  batch_available_2D = c((K+1):(K*(K+1)/2))
+  batch_available_1D = c(1:K)
+  
+  sup4<-c(4039, 4056) # FIXED FOR BETTER VISUALISATION
+  sup3 = c(1605, 58) # FIXED FOR BETTER VISUALISATION
+  
+  
+  
+  sup1<-sample(batch_available_1D,pu.fi.or)
+  sup2<-sample(batch_available_2D,pu.int)
+  for(elem in sup2){
+    batch_available_2D = batch_available_2D[batch_available_2D!=elem]
+  }
+  theta <- matrix(0,K+K*(K-1)/2, 1)
+  sup<-sort(c(sup1,sup2,sup3,sup4))
+  theta[sup]<-sample(c(-1,1),s,replace=TRUE)
+
+  return(theta)
+}
 
 sparse.param.quad.model<-function(s,m, interOnly=FALSE, theta_range=theta_range){
   K<-m
@@ -72,16 +110,16 @@ h2 <- 0.4
 s2 <- 0.95 * h2
 theta_range = 1
 p = 0.5 # ratio 0/1 (binom rule)
-s <- 5 # Number of signal
+s <- 10 # Number of signal
 m <- 100 # number of SNPs
-n <- 50 # Number of individuals
+n <- 1000 # Number of individuals
 
 
 # Generate X  
 X<-generate.quad.design(m,n)
 
 # Generate theta
-theta<-sparse.param.quad.model(s,m, theta_range=theta_range)
+theta<-sparse.param.quad.model.many(s,m, theta_range=theta_range)
 var.theta <- var(X%*%theta)
 sup<-which(theta!=0)
 
